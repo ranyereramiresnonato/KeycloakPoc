@@ -16,7 +16,6 @@ services:
     networks:
       - app-net
 
-
   keycloak:
     image: quay.io/keycloak/keycloak:25.0.6
     container_name: keycloak
@@ -38,7 +37,6 @@ services:
     networks:
       - app-net
 
-
   paymentvoucherapi:
     build:
       context: .
@@ -50,12 +48,9 @@ services:
       - keycloak
     environment:
       ASPNETCORE_ENVIRONMENT: "Development"
-      Keycloak__Url: "http://keycloak:8080"
-      Keycloak__Realm: "fintech"
-      Keycloak__ClientId: "payment-voucher-api"
+      ASPNETCORE_URLS: "http://+:8080"      
     networks:
       - app-net
-
 
   purchasesapi:
     build:
@@ -68,12 +63,9 @@ services:
       - keycloak
     environment:
       ASPNETCORE_ENVIRONMENT: "Development"
-      Keycloak__Url: "http://keycloak:8080"
-      Keycloak__Realm: "fintech"
-      Keycloak__ClientId: "purchases-api"
+      ASPNETCORE_URLS: "http://+:8080"       
     networks:
       - app-net
-
 
 networks:
   app-net:

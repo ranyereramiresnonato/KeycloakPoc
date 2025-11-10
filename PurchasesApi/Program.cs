@@ -12,7 +12,7 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
-    options.Authority = "http://localhost:8080/realms/fintech-poc"; // realm URL
+    options.Authority = "http://keycloak:8081/realms/FintechRealm"; // realm URL
     options.Audience = "purchases-api"; // client id
     options.RequireHttpsMetadata = false; // desativa HTTPS só para dev
 
