@@ -1,4 +1,4 @@
-version: '3.9'
+﻿version: '3.9'
 
 services:
   postgres:
@@ -64,6 +64,10 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: "Development"
       ASPNETCORE_URLS: "http://+:8080"       
+      Logging__LogLevel__Default: "Information"
+      Logging__LogLevel__Microsoft: "Information"
+      Logging__LogLevel__Microsoft.AspNetCore.Authentication: "Debug"
+      Logging__LogLevel__Microsoft.IdentityModel: "Debug"
     networks:
       - app-net
 

@@ -1,9 +1,8 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+ï»¿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
 
 builder.Services.AddAuthentication(options =>
 {
@@ -12,28 +11,56 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
-    options.Authority = "http://keycloak:8081/realms/FintechRealm"; // realm URL
-    options.Audience = "purchases-api"; // client id
-    options.RequireHttpsMetadata = false; // desativa HTTPS só para dev
+    options.Authority = "http://keycloak:8080/realms/FintechRealm"; // Realm principal
+    options.Audience = "account"; // Client ID configurado no Keycloak
+    options.RequireHttpsMetadata = false; // Somente em dev
 
-    // Validação de token (opcional mas recomendado)
+    // ParÃ¢metros de validaÃ§Ã£o do token
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateAudience = true,
         ValidateIssuer = true,
         ValidateLifetime = true,
-        ValidateIssuerSigningKey = true
+        ValidateIssuerSigningKey = true,
+
+        // Permite mÃºltiplos emissores
+        ValidIssuers = new[]
+        {
+            "http://localhost:8081/realms/FintechRealm",
+            "http://keycloak:8081/realms/FintechRealm"
+        }
+    };
+
+    options.Events = new JwtBearerEvents
+    {
+        OnTokenValidated = context =>
+        {
+            var claimsIdentity = context.Principal?.Identity as ClaimsIdentity;
+            if (claimsIdentity == null)
+                return Task.CompletedTask;
+
+            var realmRoles = context.Principal?.FindFirst("realm_access")?.Value;
+            if (!string.IsNullOrEmpty(realmRoles))
+            {
+                var parsed = System.Text.Json.JsonDocument.Parse(realmRoles);
+                if (parsed.RootElement.TryGetProperty("roles", out var rolesElement))
+                {
+                    foreach (var role in rolesElement.EnumerateArray())
+                    {
+                        claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, role.GetString()!));
+                    }
+                }
+            }
+            return Task.CompletedTask;
+        },
     };
 });
 
 builder.Services.AddControllers();
-
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();
