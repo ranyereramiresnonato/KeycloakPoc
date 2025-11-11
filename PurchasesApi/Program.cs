@@ -1,8 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using PurchasesApi.Services;
 using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddHttpClient<IPaymentVoucherService, PaymentVoucherService>();
+
 
 builder.Services.AddAuthentication(options =>
 {
