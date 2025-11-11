@@ -15,11 +15,10 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
-    options.Authority = "http://keycloak:8080/realms/FintechRealm"; // Realm principal
-    options.Audience = "account"; // Client ID configurado no Keycloak
-    options.RequireHttpsMetadata = false; // Somente em dev
+    options.Authority = "http://keycloak:8080/realms/FintechRealm";
+    options.Audience = "account";
+    options.RequireHttpsMetadata = false;
 
-    // Parâmetros de validação do token
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateAudience = true,
@@ -27,7 +26,6 @@ builder.Services.AddAuthentication(options =>
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
 
-        // Permite múltiplos emissores
         ValidIssuers = new[]
         {
             "http://localhost:8081/realms/FintechRealm",

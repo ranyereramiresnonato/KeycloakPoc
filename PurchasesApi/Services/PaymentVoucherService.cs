@@ -16,7 +16,6 @@ namespace PurchasesApi.Services
 
         public async Task<string?> GetVoucherBase64ByPurchaseIdAsync(int purchaseId)
         {
-            // 1️⃣ Faz login no PaymentVoucherApi
             var loginPayload = new
             {
                 Username = "microservice",
