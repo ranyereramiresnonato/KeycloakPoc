@@ -1,6 +1,61 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using PaymentVoucherApi.Services;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.Authority = "http://keycloak:8080/realms/FintechRealm"; // Realm principal
+    options.Audience = "account"; // Client ID configurado no Keycloak
+    options.RequireHttpsMetadata = false; // Somente em dev
+
+    // Parâmetros de validação do token
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateAudience = true,
+        ValidateIssuer = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+
+        // Permite múltiplos emissores
+        ValidIssuers = new[]
+        {
+            "http://localhost:8081/realms/FintechRealm",
+            "http://keycloak:8081/realms/FintechRealm"
+        }
+    };
+
+    options.Events = new JwtBearerEvents
+    {
+        OnTokenValidated = context =>
+        {
+            var claimsIdentity = context.Principal?.Identity as ClaimsIdentity;
+            if (claimsIdentity == null)
+                return Task.CompletedTask;
+
+            var realmRoles = context.Principal?.FindFirst("realm_access")?.Value;
+            if (!string.IsNullOrEmpty(realmRoles))
+            {
+                var parsed = System.Text.Json.JsonDocument.Parse(realmRoles);
+                if (parsed.RootElement.TryGetProperty("roles", out var rolesElement))
+                {
+                    foreach (var role in rolesElement.EnumerateArray())
+                    {
+                        claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, role.GetString()!));
+                    }
+                }
+            }
+            return Task.CompletedTask;
+        },
+    };
+});
 
 // Add services to the container.
 builder.Services.AddHttpClient<ITokenService, TokenService>();
