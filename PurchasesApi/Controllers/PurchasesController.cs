@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using PurchasesApi.Services;
 
 namespace PurchasesApi.Controllers
 {
@@ -8,12 +7,6 @@ namespace PurchasesApi.Controllers
     [Route("api/[controller]")]
     public class PurchasesController : ControllerBase
     {
-        private readonly IPaymentVoucherService _voucherService;
-        public PurchasesController(IPaymentVoucherService voucherService)
-        {
-            _voucherService = voucherService;
-        }
-
         private static readonly List<dynamic> Purchases = new()
         {
             new { Id = 1, User = "alice", Item = "Notebook Dell", Value = 5500.00, Date = DateTime.UtcNow.AddDays(-10) },
@@ -57,22 +50,6 @@ namespace PurchasesApi.Controllers
             {
                 message = $"Compra {id} excluída com sucesso (mock)."
             });
-        }
-
-        [HttpGet("{id:int}/voucher")]
-        [Authorize(Roles = "SimpleUser")]
-        public async Task<IActionResult> GetVoucher(int id)
-        {
-            var purchase = Purchases.FirstOrDefault(p => p.Id == id);
-            if (purchase == null)
-                return NotFound(new { message = "Compra não encontrada." });
-
-            var pdfBase64 = await _voucherService.GetVoucherBase64ByPurchaseIdAsync(id);
-
-            if (string.IsNullOrEmpty(pdfBase64))
-                return BadRequest(new { message = "Não foi possível obter o comprovante de pagamento." });
-
-            return Ok(pdfBase64);
         }
     }
 }

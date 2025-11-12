@@ -10,7 +10,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Itens de Solução", "Itens
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PurchasesApi", "PurchasesApi\PurchasesApi.csproj", "{B6C526F7-7729-4620-9467-B8F911F082B0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PaymentVoucherApi", "PaymentVoucherApi\PaymentVoucherApi.csproj", "{FFF836A2-F847-4E1E-AB24-90CAB51424D7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProductsApi", "ProductsApi\ProductsApi.csproj", "{CAA07A83-E8C3-AEEC-9D2B-4B03A9B6EC4F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -22,10 +22,10 @@ Global
 		{B6C526F7-7729-4620-9467-B8F911F082B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B6C526F7-7729-4620-9467-B8F911F082B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B6C526F7-7729-4620-9467-B8F911F082B0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FFF836A2-F847-4E1E-AB24-90CAB51424D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FFF836A2-F847-4E1E-AB24-90CAB51424D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FFF836A2-F847-4E1E-AB24-90CAB51424D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FFF836A2-F847-4E1E-AB24-90CAB51424D7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CAA07A83-E8C3-AEEC-9D2B-4B03A9B6EC4F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CAA07A83-E8C3-AEEC-9D2B-4B03A9B6EC4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CAA07A83-E8C3-AEEC-9D2B-4B03A9B6EC4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CAA07A83-E8C3-AEEC-9D2B-4B03A9B6EC4F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

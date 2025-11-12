@@ -37,21 +37,6 @@ services:
     networks:
       - app-net
 
-  paymentvoucherapi:
-    build:
-      context: .
-      dockerfile: PaymentVoucherApi/Dockerfile
-    container_name: paymentvoucherapi
-    ports:
-      - "5001:8080"
-    depends_on:
-      - keycloak
-    environment:
-      ASPNETCORE_ENVIRONMENT: "Development"
-      ASPNETCORE_URLS: "http://+:8080"      
-    networks:
-      - app-net
-
   purchasesapi:
     build:
       context: .
@@ -68,6 +53,21 @@ services:
       Logging__LogLevel__Microsoft: "Information"
       Logging__LogLevel__Microsoft.AspNetCore.Authentication: "Debug"
       Logging__LogLevel__Microsoft.IdentityModel: "Debug"
+    networks:
+      - app-net
+
+  productsapi:
+    build:
+      context: .
+      dockerfile: ProductsApi/Dockerfile
+    container_name: productsapi
+    ports:
+      - "5003:8080"
+    depends_on:
+      - keycloak
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Development"
+      ASPNETCORE_URLS: "http://+:8080"      
     networks:
       - app-net
 
