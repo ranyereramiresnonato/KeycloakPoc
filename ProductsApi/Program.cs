@@ -15,12 +15,11 @@ builder.Services.AddAuthentication(options =>
 .AddJwtBearer(options =>
 {
     options.Authority = "http://keycloak:8080/realms/FintechRealm";
-    options.Audience = "account";
     options.RequireHttpsMetadata = false;
 
     options.TokenValidationParameters = new TokenValidationParameters
     {
-        ValidateAudience = true,
+        ValidateAudience = false,
         ValidateIssuer = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
@@ -34,26 +33,36 @@ builder.Services.AddAuthentication(options =>
 
     options.Events = new JwtBearerEvents
     {
-        OnTokenValidated = context =>
+        OnTokenValidated = async context =>
         {
             var claimsIdentity = context.Principal?.Identity as ClaimsIdentity;
             if (claimsIdentity == null)
-                return Task.CompletedTask;
+                return;
 
-            var realmRoles = context.Principal?.FindFirst("realm_access")?.Value;
-            if (!string.IsNullOrEmpty(realmRoles))
+            // 1️⃣ Pegar o "sub" do token (ID do Keycloak)
+            var sub = context.Principal?.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                      ?? context.Principal?.FindFirst("sub")?.Value;
+
+            if (string.IsNullOrWhiteSpace(sub))
+                return;
+
+            // 2️⃣ Obter service via DI
+            var keycloakService = context.HttpContext.RequestServices.GetRequiredService<IKeycloakService>();
+
+            // 3️⃣ Buscar roles composite no Keycloak
+            var rolesJson = await keycloakService.GetUserCompositeRolesAsync(sub);
+
+            var doc = System.Text.Json.JsonDocument.Parse(rolesJson);
+
+            // 4️⃣ Percorrer o JSON e adicionar roles como Claims
+            foreach (var role in doc.RootElement.EnumerateArray())
             {
-                var parsed = System.Text.Json.JsonDocument.Parse(realmRoles);
-                if (parsed.RootElement.TryGetProperty("roles", out var rolesElement))
+                if (role.TryGetProperty("name", out var roleName))
                 {
-                    foreach (var role in rolesElement.EnumerateArray())
-                    {
-                        claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, role.GetString()!));
-                    }
+                    claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, roleName.GetString()!));
                 }
             }
-            return Task.CompletedTask;
-        },
+        }
     };
 });
 
