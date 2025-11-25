@@ -70,9 +70,6 @@ builder.Services.AddAuthentication(options =>
             {
                 if (role.TryGetProperty("name", out var roleName))
                 {
-                    // Você pode prefixar para diferenciar:
-                    // claimsIdentity.AddClaim(new Claim("client_role", roleName.GetString()!));
-
                     claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, roleName.GetString()!));
                 }
             }

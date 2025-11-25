@@ -3,7 +3,6 @@ using System.Text.Json;
 
 namespace PurchasesApi.Services
 {
-
     public class KeycloakService : IKeycloakService
     {
         private readonly HttpClient _httpClient;
@@ -26,12 +25,12 @@ namespace PurchasesApi.Services
             string url = $"{baseUrl}/realms/{realm}/protocol/openid-connect/token";
 
             var content = new FormUrlEncodedContent(new Dictionary<string, string>
-        {
-            { "grant_type", "password" },
-            { "client_id", clientId },
-            { "username", username },
-            { "password", password }
-        });
+            {
+                { "grant_type", "password" },
+                { "client_id", clientId },
+                { "username", username },
+                { "password", password }
+            });
 
             var response = await _httpClient.PostAsync(url, content);
 
@@ -70,6 +69,7 @@ namespace PurchasesApi.Services
             string baseUrl = _config["KeycloakValidation:BaseUrl"];
             string realm = _config["KeycloakValidation:Realm"];
             string targetClientId = _config["KeycloakValidation:TargetClientId"];
+
             string token = await GetAdminTokenAsync();
 
             string url = $"{baseUrl}/admin/realms/{realm}/clients?clientId={targetClientId}";
@@ -79,11 +79,12 @@ namespace PurchasesApi.Services
 
             var response = await _httpClient.SendAsync(request);
 
+            string responseString = await response.Content.ReadAsStringAsync();
+
             if (!response.IsSuccessStatusCode)
                 throw new Exception("Erro ao buscar clientId interno");
 
-            var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
-
+            var json = JsonDocument.Parse(responseString);
             return json.RootElement[0].GetProperty("id").GetString();
         }
 
@@ -96,18 +97,18 @@ namespace PurchasesApi.Services
             string clientUuid = await GetTargetClientInternalIdAsync();
 
             string url =
-                $"{baseUrl}/admin/realms/{realm}/users/{userId}/role-mappings/clients/{clientUuid}";
+                $"{baseUrl}/admin/realms/{realm}/users/{userId}/role-mappings/clients/{clientUuid}/composite";
 
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
             var response = await _httpClient.SendAsync(request);
+            string body = await response.Content.ReadAsStringAsync();
 
             if (!response.IsSuccessStatusCode)
                 throw new Exception($"Erro ao buscar roles do client: {response.StatusCode}");
 
-            return await response.Content.ReadAsStringAsync();
+            return body;
         }
-
     }
 }
