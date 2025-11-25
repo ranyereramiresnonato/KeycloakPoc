@@ -4,5 +4,6 @@
     {
         Task<string> GetAdminTokenAsync();
         Task<string> GetUserCompositeRolesAsync(string userId);
+        Task<string> GetUserClientRolesAsync(string userId);
     }
 }

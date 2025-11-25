@@ -50,5 +50,21 @@ namespace ProductsApi.Controllers
                 message = $"Produto {id} excluído com sucesso (mock)."
             });
         }
+
+        [HttpPut("{id:int}")]
+        [Authorize(Roles = "UpdateProducts")]
+        public IActionResult Update(int id, [FromBody] dynamic updatedProduct)
+        {
+            var product = Products.FirstOrDefault(p => p.Id == id);
+            if (product == null)
+                return NotFound(new { message = "Produto não encontrado." });
+
+            return Ok(new
+            {
+                message = $"Produto {id} atualizado com sucesso (mock).",
+                data = updatedProduct
+            });
+        }
+
     }
 }

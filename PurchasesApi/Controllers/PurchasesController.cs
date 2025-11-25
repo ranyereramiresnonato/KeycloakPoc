@@ -51,5 +51,20 @@ namespace PurchasesApi.Controllers
                 message = $"Compra {id} excluída com sucesso (mock)."
             });
         }
+
+        [HttpPut("{id:int}")]
+        [Authorize(Roles = "UpdatePurchases")]
+        public IActionResult Update(int id, [FromBody] dynamic updatedPurchase)
+        {
+            var purchase = Purchases.FirstOrDefault(p => p.Id == id);
+            if (purchase == null)
+                return NotFound(new { message = "Compra não encontrada." });
+
+            return Ok(new
+            {
+                message = $"Compra {id} atualizada com sucesso (mock).",
+                data = updatedPurchase
+            });
+        }
     }
 }

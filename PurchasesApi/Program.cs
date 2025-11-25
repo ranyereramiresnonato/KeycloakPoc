@@ -62,6 +62,20 @@ builder.Services.AddAuthentication(options =>
                     claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, roleName.GetString()!));
                 }
             }
+
+            var clientRolesJson = await keycloakService.GetUserClientRolesAsync(sub);
+            var clientDoc = System.Text.Json.JsonDocument.Parse(clientRolesJson);
+
+            foreach (var role in clientDoc.RootElement.EnumerateArray())
+            {
+                if (role.TryGetProperty("name", out var roleName))
+                {
+                    // Você pode prefixar para diferenciar:
+                    // claimsIdentity.AddClaim(new Claim("client_role", roleName.GetString()!));
+
+                    claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, roleName.GetString()!));
+                }
+            }
         }
     };
 });
